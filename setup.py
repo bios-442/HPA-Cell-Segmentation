@@ -17,7 +17,7 @@ except FileNotFoundError:
     print("WARNING: missing requirements.txt.")
 
 requirements.append(
-    "pytorch_zoo@https://github.com/haoxusci/pytorch_zoo/archive/master.zip"
+    "pytorch_zoo@https://github.com/bios-442/pytorch_zoo/archive/master.zip"
 )
 
 setup(

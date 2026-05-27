@@ -84,7 +84,8 @@ class CellSegmentator(object):
                 )
                 download_with_url(NUCLEI_MODEL_URL, nuclei_model)
             nuclei_model = torch.load(
-                nuclei_model, map_location=torch.device(self.device)
+                nuclei_model, map_location=torch.device(self.device),
+                weights_only=False,
             )
         if isinstance(nuclei_model, torch.nn.DataParallel) and device == "cpu":
             nuclei_model = nuclei_model.module
@@ -101,7 +102,7 @@ class CellSegmentator(object):
                     download_with_url(MULTI_CHANNEL_CELL_MODEL_URL, cell_model)
                 else:
                     download_with_url(TWO_CHANNEL_CELL_MODEL_URL, cell_model)
-            cell_model = torch.load(cell_model, map_location=torch.device(self.device))
+            cell_model = torch.load(cell_model, map_location=torch.device(self.device), weights_only=False)
         self.cell_model = cell_model.to(self.device)
         self.scale_factor = scale_factor
         self.padding = padding
@@ -201,7 +202,7 @@ class CellSegmentator(object):
             self.target_shape = image.shape
             if len(image.shape) == 2:
                 image = np.dstack((image, image, image))
-            image = transform.rescale(image, self.scale_factor, multichannel=True)
+            image = transform.rescale(image, self.scale_factor, channel_axis=-1)
             nuc_image = np.dstack((image[..., 2], image[..., 2], image[..., 2]))
             if self.padding:
                 rows, cols = nuc_image.shape[:2]
@@ -289,7 +290,7 @@ class CellSegmentator(object):
             self.target_shape = image.shape
             if not len(image.shape) == 3:
                 raise ValueError("image should has 3 channels")
-            cell_image = transform.rescale(image, self.scale_factor, multichannel=True)
+            cell_image = transform.rescale(image, self.scale_factor, channel_axis=-1)
             if self.padding:
                 rows, cols = cell_image.shape[:2]
                 self.scaled_shape = rows, cols
